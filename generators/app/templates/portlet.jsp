@@ -37,6 +37,12 @@
   })(window, underscore);
 </script>
 
-<div id="<%= portletName %>" ng-controller="<%= portletName + 'Controller' %>">
+<style>
+  #<%= portletName %>[ng-cloak] {
+    display: none;
+  }
+</style>
+
+<div id="<%= portletName %>" ng-cloak ng-controller="<%= portletName + 'Controller' %>">
   <div ng-repeat="thing in awesomeThings">
 </div>
