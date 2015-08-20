@@ -17,6 +17,8 @@
     "generators"
   ],
   "keywords": [
+    "uportal",
+    "angular",
     "yeoman-generator"
   ],
   "dependencies": {
