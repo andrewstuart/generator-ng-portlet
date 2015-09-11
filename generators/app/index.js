@@ -17,18 +17,20 @@ module.exports = yeoman.generators.Base.extend({
 
     // Have Yeoman greet the user.
     this.log(yosay(
-      'Welcome to the good ' + chalk.red('NgPortlet') + ' generator!'
+      'Welcome to the ' + chalk.red('NgPortlet') + ' generator!'
     ));
 
     var prompts = [{
       type: 'input',
-      name: 'name',
-      message: 'What is the name of your generator?',
+      name: 'portletName',
+      message: 'What is the name of your portlet?',
       default: this.portletName
     }];
 
     this.prompt(prompts, function (props) {
       this.portletName = props.portletName || this.portletName;
+      this.camelName = _.camelCase(this.portletName);
+      this.snakeName = _.snakeCase(this.portletName);
       this.props = props;
       // To access props later use this.props.someOption;
 
@@ -47,9 +49,5 @@ module.exports = yeoman.generators.Base.extend({
     // },
     // projectfiles: function () {
     // }
-  },
-
-  install: function () {
-    this.installDependencies();
   }
 });

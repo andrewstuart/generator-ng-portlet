@@ -1,3 +1,14 @@
+<%%@ page contentType="text/html" isELIgnored="false" %>
+<%%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%%@ taglib prefix="portlet" uri="http://java.sun.com/portlet_2_0" %>
+
+<portlet:defineObjects/>
+
+<c:set var="nc"><portlet:namespace/></c:set>
+<c:set var="lc" value="${fn:toLowerCase(nc)}" />
+<c:set var="n" value="${fn:replace(lc, '_', '')}"/>
+
 <script type="text/javascript">
   (function(window, _) {
     if (typeof window.angular === 'undefined') {
@@ -24,14 +35,14 @@
     }
 
     function bootstrap() {
-      var app = angular.module('<%= portletName %>', []);
+      var app = angular.module('${n}-<%= portletName %>', []);
       register(app);
-      angular.bootstrap(document.getElementById('<%= portletName %>'), ['<%= portletName %>']);
+      angular.bootstrap(document.getElementById('${n}-<%= portletName %>'), ['${n}-<%= portletName %>']);
     }
 
     function register(app) {
-      app.controller('<%= portletName + "Controller" %>', function($scope) {
-        $scope.awesomeThings = ['AngularJS', 'Bower', 'Grunt'];
+      app.controller('<%= camelName + "Controller" %>', function($scope) {
+        $scope.awesomeThings = ['AngularJS', 'Bower', 'Grunt', 'Yeoman', 'uPortal', 'Open Source!'];
       });
     }
   })(window, underscore);
@@ -43,6 +54,9 @@
   }
 </style>
 
-<div id="<%= portletName %>" ng-cloak ng-controller="<%= portletName + 'Controller' %>">
-  <div ng-repeat="thing in awesomeThings">
+<div id="${n}-<%= portletName %>" ng-cloak ng-controller="<%= camelName + 'Controller' %>">
+  <h1>Awesome Things</h1>
+  <ul>
+    <li ng-repeat="thing in awesomeThings"> {{$index + 1}}. {{thing}} </li>
+  </ul>
 </div>
