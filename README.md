@@ -9,3 +9,11 @@ npm install -g generator-ng-portlet;
 cd <desired directory>;
 yo ng-portlet portlet-name;
 ```
+
+## Note
+
+Currently only works for simplejsp portlets.
+
+as such, <desired directory> must be
+`uportal-portlets-overlay/jasig-widget-portlets/src/main/webapp/WEB-INF/jsp`,
+or a subdirectory.
