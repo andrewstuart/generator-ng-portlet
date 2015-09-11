@@ -200,6 +200,8 @@ Generator.prototype.separateScript = function separateScript() {
 
         done();
       });
+    } else {
+      done();
     }
   })
 
@@ -249,6 +251,8 @@ Generator.prototype.scaffoldOtherFiles = function scaffoldOtherFiles() {
 
         done();
       });
+    } else {
+      done();
     }
   });
 }

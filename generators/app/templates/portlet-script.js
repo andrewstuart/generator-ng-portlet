@@ -9,12 +9,12 @@
   } else {
     //Otherwise, let jsp call your bootstrapper once angular is loaded.
     window.up = window.up || {};
-    window.up.ngApp = window.up.ngApp || {};
-    window.up.ngApp.bootstrap = window.up.ngApp.bootstrap || {};
+    window.up.ngBootstrap = window.up.ngBootstrap || {};
 
-    window.up.ngApp.bootstrap.<%= camelName %> = function(n) {
+    window.up.ngBootstrap.<%= camelName %> = function(n) {
       var app = angular.module(n + '-<%= portletName %>', []);
       register(app);
+
       var bootEle = document.getElementById(n + '-<%= portletName %>');
       angular.bootstrap(bootEle, [n + '-<%= portletName %>']);
     }

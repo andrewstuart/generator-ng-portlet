@@ -33,12 +33,12 @@
         document.body.appendChild(scr);
       }<% if ( !separateFiles ) { %>
       //Working inline, so call our bootstrap function.
-      scr.addEventListener('load', bootstrap);<% } %>
+      $(window).load(bootstrap);<% } %>
     }<% if ( !separateFiles ) { %> else {
       if (window.up.ngApp) {
         register(window.up.ngApp);
       } else {
-        bootstrap(angular);
+        bootstrap();
       }
     }
 
@@ -55,9 +55,9 @@
     }<% } else { %>
 
     $(window).load(function() {
-      if ( up.ngApp.bootstrap ) {
+      if ( up.ngBootstrap ) {
         //Once the needed scripts ready, bootstrap if needed.
-        up.ngApp.bootstrap.<%= camelName %>('${n}');
+        up.ngBootstrap.<%= camelName %>('${n}');
       }
     });
     <% } %>
