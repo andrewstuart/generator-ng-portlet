@@ -5,5 +5,7 @@ that it can be used by both portals and portlets without conflicts.
 
 # Usage
 ```bash
-yo ng-portlet portlet-name
+npm install -g generator-ng-portlet;
+cd <desired directory>;
+yo ng-portlet portlet-name;
 ```
