@@ -11,16 +11,14 @@
 <c:set var="lc" value="${fn:toLowerCase(nc)}" />
 <c:set var="n" value="${fn:replace(lc, '_', '')}"/>
 
-<% if ( !separateFiles ) { -%>
+<% if ( separateFiles ) { -%>
+<script type="text/javascript" src="<%= web.module %>"></script>
+<% } %>
+
 <script type="text/javascript">
-  (function(window, _) {
-
-    window.up = window.up || {};
-    window.up.ngApp = window.up.ngApp || {};
-    window.up.ngApp.bootstrap = window.up.ngApp.bootstrap || {};
-
-
+  (function(window, $) {
     if (typeof window.angular === 'undefined') {
+      //No matter what, check angular and load if needed.
       var ANGULAR_SCRIPT_ID = 'angular-uportal-script';
 
       var scr = document.getElementById(ANGULAR_SCRIPT_ID);
@@ -33,9 +31,10 @@
         scr.charset = 'utf-8';
         scr.src = 'https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.4.4/angular.js';
         document.body.appendChild(scr);
-      }
-      scr.addEventListener('load', bootstrap);
-    } else {
+      }<% if ( !separateFiles ) { %>
+      //Working inline, so call our bootstrap function.
+      scr.addEventListener('load', bootstrap);<% } %>
+    }<% if ( !separateFiles ) { %> else {
       if (window.up.ngApp) {
         register(window.up.ngApp);
       } else {
@@ -53,14 +52,17 @@
       app.controller('<%= camelName + "Controller" %>', function($scope) {
         $scope.awesomeThings = ['AngularJS', 'Bower', 'Grunt', 'Yeoman', 'uPortal', 'Open Source!'];
       });
-    }
-  })(window, underscore);
-</script><% } else { -%>
-<script type="text/javascript" src="<%= web.module %>"></script>
-<script type="text/javascript">
-  window.up.ngApp.bootstrap.<%= camelName %>(${n});
+    }<% } else { %>
+
+    $(window).load(function() {
+      if ( up.ngApp.bootstrap ) {
+        //Once the needed scripts ready, bootstrap if needed.
+        up.ngApp.bootstrap.<%= camelName %>('${n}');
+      }
+    });
+    <% } %>
+  })(window, up.jQuery);
 </script>
-<% } -%>
 
 <style>
   #${n}-<%= portletName %>[ng-cloak] {
