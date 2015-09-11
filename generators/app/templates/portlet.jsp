@@ -1,3 +1,5 @@
+<%- license.jsp %>
+
 <%%@ page contentType="text/html" isELIgnored="false" %>
 <%%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
@@ -9,8 +11,15 @@
 <c:set var="lc" value="${fn:toLowerCase(nc)}" />
 <c:set var="n" value="${fn:replace(lc, '_', '')}"/>
 
+<% if ( !separateFiles ) { -%>
 <script type="text/javascript">
   (function(window, _) {
+
+    window.up = window.up || {};
+    window.up.ngApp = window.up.ngApp || {};
+    window.up.ngApp.bootstrap = window.up.ngApp.bootstrap || {};
+
+
     if (typeof window.angular === 'undefined') {
       var ANGULAR_SCRIPT_ID = 'angular-uportal-script';
 
@@ -46,10 +55,15 @@
       });
     }
   })(window, underscore);
+</script><% } else { -%>
+<script type="text/javascript" src="<%= web.module %>"></script>
+<script type="text/javascript">
+  window.up.ngApp.bootstrap.<%= camelName %>(${n});
 </script>
+<% } -%>
 
 <style>
-  #<%= portletName %>[ng-cloak] {
+  #${n}-<%= portletName %>[ng-cloak] {
     display: none;
   }
 </style>
