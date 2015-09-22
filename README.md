@@ -8,6 +8,8 @@ that it can be used by both portals and portlets without conflicts.
 npm install -g generator-ng-portlet;
 cd <desired directory>;
 yo ng-portlet portlet-name;
+cd <uportal-root-directory>;
+ant initdb;
 ```
 
 ## Note
