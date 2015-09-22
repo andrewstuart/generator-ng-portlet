@@ -5,7 +5,7 @@ that it can be used by both portals and portlets without conflicts.
 
 # Usage
 ```bash
-npm install -g generator-ng-portlet;
+npm install -g generator-ng-portlet yo;
 cd <desired directory>;
 yo ng-portlet portlet-name;
 cd <uportal-root-directory>;
