@@ -7,7 +7,7 @@ var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
 
-var license = require('./license');
+var license = require('./license.js');
 
 function findParentDir(name) {
   var dir = process.cwd();
@@ -30,6 +30,10 @@ function findRoot() {
 
   //If uportal-war directory is not found, use the current directory.
   return process.cwd();
+}
+
+function simpleJspPath () {
+  return findRoot() + '/uportal-portlets-overlay/jasig-widget-portlets/src/main/webapp/WEB-INF/jsp';
 }
 
 function getDataPath() {
@@ -108,7 +112,7 @@ var Generator = module.exports = yeoman.generators.Base.extend({
 
       _.extend(this.path, {
         root: props.rootPath,
-        jsp: this.portletName + '.jsp'
+        jsp: simpleJspPath() + '/' + this.portletName + '.jsp'
       });
 
       done();

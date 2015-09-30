@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-var license = fs.readFileSync(path.resolve(__dirname, 'LICENSE')).toString();
+var license = fs.readFileSync(path.resolve(__dirname, 'LICENSE.txt')).toString();
 
 module.exports = function(opts) {
   opts = opts || {};
