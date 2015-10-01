@@ -6,11 +6,12 @@ var yosay = require('yosay');
 var _ = require('lodash');
 var path = require('path');
 var fs = require('fs');
+var child_process = require('child_process');
 
 var license = require('./license.js');
 
-function findParentDir(name) {
-  var dir = process.cwd();
+function findParentDir(name, dir) {
+  dir = dir || process.cwd();
   while ( path.basename(dir) !== name && dir !== '/') {
     dir = path.dirname(dir);
   }
@@ -39,7 +40,6 @@ function simpleJspPath (root) {
 
 function getDataPath(root) {
   root = root || findRoot();
-  if ( root === process.cwd() ) { return root; }
 
   var buildProps = fs.readFileSync(path.resolve(root, 'build.properties')).toString();
 
@@ -54,8 +54,8 @@ function getDataPath(root) {
   return dataDir ? path.resolve(root, dataDir) : root;
 }
 
-function getWebRoot() {
-  var srcDir = findParentDir('src');
+function getWebRoot(dir) {
+  var srcDir = findParentDir('src', dir);
   var moduleDir = path.basename(path.dirname(srcDir));
   return moduleDir === 'uportal-war' ? '/uPortal' : '/' + moduleDir;
 }
@@ -64,14 +64,14 @@ var Generator = module.exports = yeoman.generators.Base.extend({
   init: function() {
     var gen = this;
 
-    this.argument('name', { type: String, required: false});
-    this.portletName = this.name || path.basename(process.cwd());
-    this.license = {
+    gen.argument('name', { type: String, required: false});
+    gen.portletName = gen.name || path.basename(process.cwd());
+    gen.license = {
       js: license(),
       xml: license({head: '<!--', mid: '', tail: '-->'}),
       jsp: license({head: '<%--', mid: '', tail: '--%>'})
     };
-    this.license.java = this.license.js;
+    gen.license.java = gen.license.js;
 
     //Default properties objects
     _.each(['path', 'web', 'static', 'data'], function(k) {
@@ -146,21 +146,50 @@ var Generator = module.exports = yeoman.generators.Base.extend({
     // },
     // projectfiles: function () {
     // }
-  }//,
-  // installing: function() {
-  //   if ( this.props.scaffoldSupportFiles ) {
-  //     this.prompt([{
-  //       input: 'confirm',
-  //       name: 'init',
-  //       message: 'Would you like to initialize the database?',
-  //       default: false
-  //     }], function(props) {
-  //       if (props.init) {
-  //         //TODO run ant initdb
-  //       }
-  //     }.bind(this));
-  //   }
-  // }
+  },
+  install: function() {
+    var gen = this;
+    var done = gen.async();
+
+    gen.prompt([{
+      type: 'confirm',
+      name: 'init',
+      message: 'Would you like to import the new portlet?',
+      default: true
+    }], function(props) {
+      if (props.init) {
+        var ant = child_process.spawn('ant', ['data-import', '-Dfile', gen.data.file], {
+          cwd: gen.path.root
+        });
+
+        var res = '';
+        var err = '';
+
+        ant.stdout.on('data', function(d) {
+          gen.log(d.toString());
+        });
+
+        ant.stderr.on('data', function(d) {
+          err += d;
+        });
+
+
+        ant.on('close', function(code) {
+          if ( code !== 0 ) {
+            gen.log(yosay('Uh oh, Ant exited with code ' + code));
+            gen.log(chalk.red(err));
+          } else {
+            gen.log(yosay('Looks like everything went well. Enjoy your ' +
+                          chalk.red(gen.portletName) + ' portlet!'));
+          }
+          done();
+        });
+
+        return;
+      }
+      done();
+    });
+  }
 });
 
 Generator.prototype.separateScript = function separateScript() {
@@ -179,12 +208,12 @@ Generator.prototype.separateScript = function separateScript() {
         type: 'input',
         name: 'fspath',
         message: 'What is the desired webapp directory for static files?',
-        default: path.resolve(findParentDir('src'), 'main/webapp')
+        default: path.resolve(findParentDir('src', simpleJspPath()), 'main/webapp')
       },{
         type: 'input',
         name: 'webRoot',
-        message: 'What will be the http base for your static files?',
-        default: getWebRoot()
+        message: 'What will be the base url (webapp url) for your static files?',
+        default: getWebRoot(simpleJspPath())
       }], function(props) {
         gen.web.root = props.webRoot;
         gen.static.root = props.fspath;
@@ -196,7 +225,9 @@ Generator.prototype.separateScript = function separateScript() {
 
           gen[cfg].root = path.resolve(gen[cfg].root, gen.snakeName);
 
-          ['scripts', 'css', 'images'].forEach(dir => gen[cfg][dir] = path.resolve(gen[cfg].root, dir));
+          ['scripts', 'css', 'images'].forEach(function(dir) {
+            gen[cfg][dir] = path.resolve(gen[cfg].root, dir)
+          });
 
           gen[cfg].module = path.resolve(gen[cfg].scripts, 'module.js');
         });
