@@ -158,8 +158,26 @@ var Generator = module.exports = yeoman.generators.Base.extend({
         message: 'Would you like to import the new portlet?',
         default: true
       }], function(props) {
-        if (props.init) {
-          var ant = child_process.spawn('ant', ['data-import', '-Dfile', gen.data.file], {
+        if ( !props.init ) { done(); }
+
+        gen.prompt([{
+          type: 'input',
+          name: 'antEnv',
+          message: 'Which filters/*.properites file should be used? (Blank for default)',
+        }], function(props2) {
+
+          var antArgs = [
+            '-Dmaven.test.skip=true',
+            'data-import',
+            '-Dfile',
+            gen.data.file
+          ];
+
+          if ( props.antEnv ) {
+            antArgs.unshift('-Denv=' + props2.antEnv);
+          }
+
+          var ant = child_process.spawn('ant', antArgs, {
             cwd: gen.path.root
           });
 
@@ -185,10 +203,7 @@ var Generator = module.exports = yeoman.generators.Base.extend({
             }
             done();
           });
-
-          return;
-        }
-        done();
+        });
       });
     }
   }
