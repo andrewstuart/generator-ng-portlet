@@ -32,12 +32,13 @@ function findRoot() {
   return process.cwd();
 }
 
-function simpleJspPath () {
-  return findRoot() + '/uportal-portlets-overlay/jasig-widget-portlets/src/main/webapp/WEB-INF/jsp';
+function simpleJspPath (root) {
+  root = root || findRoot();
+  return root + '/uportal-portlets-overlay/jasig-widget-portlets/src/main/webapp/WEB-INF/jsp';
 }
 
-function getDataPath() {
-  var root = findRoot();
+function getDataPath(root) {
+  root = root || findRoot();
   if ( root === process.cwd() ) { return root; }
 
   var buildProps = fs.readFileSync(path.resolve(root, 'build.properties')).toString();
@@ -112,7 +113,7 @@ var Generator = module.exports = yeoman.generators.Base.extend({
 
       _.extend(this.path, {
         root: props.rootPath,
-        jsp: simpleJspPath() + '/' + this.portletName + '.jsp'
+        jsp: simpleJspPath(props.rootPath) + '/' + this.portletName + '.jsp'
       });
 
       done();
@@ -181,11 +182,11 @@ Generator.prototype.separateScript = function separateScript() {
         default: findParentDir('src') + '/main/webapp'
       },{
         type: 'input',
-        name: 'root',
+        name: 'webRoot',
         message: 'What will be the http base for your static files?',
         default: getWebRoot()
       }], function(props) {
-        gen.web.root = props.root;
+        gen.web.root = props.webRoot;
         gen.static.root = props.fspath;
 
         //Set up directories
@@ -225,9 +226,9 @@ Generator.prototype.scaffoldOtherFiles = function scaffoldOtherFiles() {
     if ( props.scaffoldSupportFiles ) {
       return gen.prompt([{
         type: 'input',
-        name: 'directory',
+        name: 'dataDir',
         message: 'What directory should be used for the data files?',
-        default: getDataPath()
+        default: getDataPath(gen.path.root)
       },{
         type: 'input',
         name: 'fname',
@@ -251,7 +252,7 @@ Generator.prototype.scaffoldOtherFiles = function scaffoldOtherFiles() {
       }], function(props) {
 
         _.extend(gen.data, props);
-        gen.data.file = gen.data.directory + '/' + gen.portletName + '.portlet-definition.xml'
+        gen.data.file = gen.data.dataDir + '/portlet-definition/' + gen.portletName + '.portlet-definition.xml'
 
         done();
       });
