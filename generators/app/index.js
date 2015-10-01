@@ -179,7 +179,7 @@ Generator.prototype.separateScript = function separateScript() {
         type: 'input',
         name: 'fspath',
         message: 'What is the desired webapp directory for static files?',
-        default: findParentDir('src') + '/main/webapp'
+        default: path.resolve(findParentDir('src'), 'main/webapp')
       },{
         type: 'input',
         name: 'webRoot',
@@ -194,13 +194,11 @@ Generator.prototype.separateScript = function separateScript() {
         //Setup main module script file locations
         _.each(['static', 'web'], function(cfg) {
 
-          gen[cfg].root += '/' + gen.snakeName;
+          gen[cfg].root = path.resolve(gen[cfg].root, gen.snakeName);
 
-          _.each(['scripts', 'css', 'images'], function(dir) {
-            gen[cfg][dir] = [gen[cfg].root, dir].join('/');
-          });
+          ['scripts', 'css', 'images'].forEach(dir => gen[cfg][dir] = path.resolve(gen[cfg].root, dir));
 
-          gen[cfg].module = gen[cfg].scripts + '/module.js';
+          gen[cfg].module = path.resolve(gen[cfg].scripts, 'module.js');
         });
 
         done();
@@ -252,7 +250,7 @@ Generator.prototype.scaffoldOtherFiles = function scaffoldOtherFiles() {
       }], function(props) {
 
         _.extend(gen.data, props);
-        gen.data.file = gen.data.dataDir + '/portlet-definition/' + gen.portletName + '.portlet-definition.xml'
+        gen.data.file = path.resolve(gen.data.dataDir, 'portlet-definition', gen.portletName + '.portlet-definition.xml')
 
         done();
       });
