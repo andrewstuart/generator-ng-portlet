@@ -164,6 +164,7 @@ var Generator = module.exports = yeoman.generators.Base.extend({
           type: 'input',
           name: 'antEnv',
           message: 'Which filters/*.properites file should be used? (Blank for default)',
+          save: true
         }], function(props2) {
 
           var antArgs = [
@@ -173,7 +174,7 @@ var Generator = module.exports = yeoman.generators.Base.extend({
             gen.data.file
           ];
 
-          if ( props.antEnv ) {
+          if ( props2.antEnv ) {
             antArgs.unshift('-Denv=' + props2.antEnv);
           }
 
@@ -184,9 +185,7 @@ var Generator = module.exports = yeoman.generators.Base.extend({
           var res = '';
           var err = '';
 
-          ant.stdout.on('data', function(d) {
-            gen.log(d.toString());
-          });
+          ant.stdout.pipe(process.stdout);
 
           ant.stderr.on('data', function(d) {
             err += d;
@@ -195,7 +194,10 @@ var Generator = module.exports = yeoman.generators.Base.extend({
 
           ant.on('close', function(code) {
             if ( code !== 0 ) {
-              gen.log(yosay('Uh oh, Ant exited with code ' + code));
+              gen.log(yosay(
+                'Uh oh, Ant exited with code ' + code + '. Here\'s the command we ' +
+                  'ran (in yellow).'))
+              gen.log(chalk.yellow('ant ' + antArgs.join(' ') + '.'));
               gen.log(chalk.red(err));
             } else {
               gen.log(yosay('Looks like everything went well. Enjoy your ' +
