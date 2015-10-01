@@ -34,6 +34,7 @@
   "devDependencies": {
     "fs-extra": "^0.24.0",
     "mkdirp": "^0.5.1",
-    "mocha": "*"
+    "mocha": "*",
+    "moment": "^2.10.6"
   }
 }

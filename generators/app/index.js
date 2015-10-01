@@ -151,44 +151,46 @@ var Generator = module.exports = yeoman.generators.Base.extend({
     var gen = this;
     var done = gen.async();
 
-    gen.prompt([{
-      type: 'confirm',
-      name: 'init',
-      message: 'Would you like to import the new portlet?',
-      default: true
-    }], function(props) {
-      if (props.init) {
-        var ant = child_process.spawn('ant', ['data-import', '-Dfile', gen.data.file], {
-          cwd: gen.path.root
-        });
+    if ( gen.scaffoldSupportFiles ) {
+      gen.prompt([{
+        type: 'confirm',
+        name: 'init',
+        message: 'Would you like to import the new portlet?',
+        default: true
+      }], function(props) {
+        if (props.init) {
+          var ant = child_process.spawn('ant', ['data-import', '-Dfile', gen.data.file], {
+            cwd: gen.path.root
+          });
 
-        var res = '';
-        var err = '';
+          var res = '';
+          var err = '';
 
-        ant.stdout.on('data', function(d) {
-          gen.log(d.toString());
-        });
+          ant.stdout.on('data', function(d) {
+            gen.log(d.toString());
+          });
 
-        ant.stderr.on('data', function(d) {
-          err += d;
-        });
+          ant.stderr.on('data', function(d) {
+            err += d;
+          });
 
 
-        ant.on('close', function(code) {
-          if ( code !== 0 ) {
-            gen.log(yosay('Uh oh, Ant exited with code ' + code));
-            gen.log(chalk.red(err));
-          } else {
-            gen.log(yosay('Looks like everything went well. Enjoy your ' +
-                          chalk.red(gen.portletName) + ' portlet!'));
-          }
-          done();
-        });
+          ant.on('close', function(code) {
+            if ( code !== 0 ) {
+              gen.log(yosay('Uh oh, Ant exited with code ' + code));
+              gen.log(chalk.red(err));
+            } else {
+              gen.log(yosay('Looks like everything went well. Enjoy your ' +
+                            chalk.red(gen.portletName) + ' portlet!'));
+            }
+            done();
+          });
 
-        return;
-      }
-      done();
-    });
+          return;
+        }
+        done();
+      });
+    }
   }
 });
 
@@ -238,7 +240,6 @@ Generator.prototype.separateScript = function separateScript() {
       done();
     }
   })
-
 };
 
 Generator.prototype.scaffoldOtherFiles = function scaffoldOtherFiles() {
